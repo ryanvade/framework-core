@@ -1,0 +1,12 @@
+{
+  "name": "framework-core",
+  "version": "0.0.1",
+  "description": "CORE",
+  "main": "index.js",
+  "repository": "https://github.com/ryanvade/framework-core",
+  "author": "Ryan Owens <ryanvader82@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "typescript": "^3.0.1"
+  }
+}
