@@ -2,7 +2,7 @@ import ContainerInterface from "../Contracts/Container/ContainerInterface";
 import ContainerBindingException from "../Contracts/Container/ContainerBindingException";
 // /// <reference path="../../Contracts/Container/ContainerInterface"/>
 
-class Container implements ContainerInterface {
+export default class Container implements ContainerInterface {
   bound(abstract: string) {
     return false;
   }

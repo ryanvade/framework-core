@@ -10,7 +10,7 @@
     "lint": "tslint -c tslint.json -p tsconfig.json",
     "buildts": "tsc",
     "build": "npm run lint && npm run buildts",
-    "test": "mocha --require ts-node/register 'test/**/*.{ts,tsx}'"
+    "test": "mocha --require ts-node/register \"test/**/*.ts\""
   },
   "dependencies": {
     "typescript": "^3.0.1"
