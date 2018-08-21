@@ -3,7 +3,7 @@ import ContainerBindingException from "../Contracts/Container/ContainerBindingEx
 // /// <reference path="../../Contracts/Container/ContainerInterface"/>
 
 class Container implements ContainerInterface {
-  bound(abstract: string){
+  bound(abstract: string) {
     return false;
   }
 
@@ -11,11 +11,11 @@ class Container implements ContainerInterface {
     return;
   }
 
-  bind(abstract: string, concrete?: any, shared ?:boolean) {
+  bind(abstract: string, concrete?: any, shared?: boolean) {
     return;
   }
 
-  bindIf(abstract: string, concrete?: any, shared ?:boolean) {
+  bindIf(abstract: string, concrete?: any, shared?: boolean) {
     return;
   }
 
