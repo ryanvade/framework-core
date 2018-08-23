@@ -1,18 +1,35 @@
-import ContainerInterface from "../Contracts/Container/ContainerInterface";
-import ContainerBindingException from "../Contracts/Container/ContainerBindingException";
+import Constructable from "Contracts/Container/Constructable";
+import ContainerInterface from "Contracts/Container/ContainerInterface";
+import ContainerBindingException from "Contracts/Container/ContainerBindingException";
 // /// <reference path="../../Contracts/Container/ContainerInterface"/>
 
+class Closure implements Constructable {}
+
 export default class Container implements ContainerInterface {
+  bindings: Map<string, string | Constructable<any> | undefined>;
+
   bound(abstract: string) {
-    return false;
+    return this.bindings.has(abstract);
   }
 
   alias(abstract: string, alias: string) {
     return;
   }
 
-  bind(abstract: string, concrete?: any, shared?: boolean) {
-    return;
+  bind(abstract: string, concrete?: string | Constructable<any> | undefined, shared?: boolean) {
+    if (concrete == undefined) {
+      concrete = abstract;
+    }
+
+    if (typeof concrete != Constructable) {
+      concrete = (abstract: string, concrete: string) => {
+        if (abstract == concrete) {
+          return new Closure();
+        }
+      };
+    }
+
+    this.bindings.set(abstract, concrete);
   }
 
   bindIf(abstract: string, concrete?: any, shared?: boolean) {

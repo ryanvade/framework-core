@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import Container from "../../src/Container/Container";
+import Container from "../src/Container/Container";
 import "mocha";
 
 describe("Container Constructor Test", () => {

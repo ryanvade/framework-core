@@ -2,6 +2,8 @@
     "compilerOptions": {
         "module": "commonjs",
         "esModuleInterop": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
         "target": "es6",
         "noImplicitAny": true,
         "moduleResolution": "node",
@@ -9,6 +11,15 @@
         "outDir": "dist",
         "baseUrl": ".",
         "paths": {
+          "Application/*": [
+            "src/Application/*"
+          ],
+          "Container/*": [
+            "src/Container/*"
+          ],
+          "Contracts/*": [
+            "src/Contracts/*"
+          ],
             "*": [
                 "node_modules/*",
                 "src/types/*"
@@ -17,5 +28,7 @@
     },
     "include": [
         "src/**/*"
-    ]
+    ],
+    "lib": ["es6"],
+    "types": ["reflect-metadata"]
 }
