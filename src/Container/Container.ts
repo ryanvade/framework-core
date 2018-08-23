@@ -3,7 +3,7 @@ import ContainerInterface from "Contracts/Container/ContainerInterface";
 import ContainerBindingException from "Contracts/Container/ContainerBindingException";
 // /// <reference path="../../Contracts/Container/ContainerInterface"/>
 
-class Closure implements Constructable {}
+class Closure {}
 
 export default class Container implements ContainerInterface {
   bindings: Map<string, string | Constructable<any> | undefined>;
@@ -21,13 +21,6 @@ export default class Container implements ContainerInterface {
       concrete = abstract;
     }
 
-    if (typeof concrete != Constructable) {
-      concrete = (abstract: string, concrete: string) => {
-        if (abstract == concrete) {
-          return new Closure();
-        }
-      };
-    }
 
     this.bindings.set(abstract, concrete);
   }
