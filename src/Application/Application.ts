@@ -39,10 +39,9 @@ export default class Application extends Container {
   }
 
   public usePublicPath(publicPath: string): Application {
-    const root = (os.platform() == "win32") ? process.cwd().split(path.sep)[0] : "/";
-    if (path.dirname(publicPath) == root) {
-      this.publicPath = this.projectPath + publicPath;
-    } else if (path.dirname(publicPath) == ".") {
+    // If the path is relateive to the project path
+    const pathDir = path.dirname(publicPath);
+    if (pathDir == ".") {
       this.publicPath = this.projectPath + "/" + publicPath;
     } else {
       this.publicPath = publicPath;
@@ -51,10 +50,9 @@ export default class Application extends Container {
   }
 
   public useStoragePath(storagePath: string): Application {
-    const root = (os.platform() == "win32") ? process.cwd().split(path.sep)[0] : "/";
-    if (path.dirname(storagePath) == root) {
-      this.storagePath = this.projectPath + storagePath;
-    } else if (path.dirname(storagePath) == ".") {
+    // If the path is relateive to the project path
+    const pathDir = path.dirname(storagePath);
+    if (pathDir == ".") {
       this.storagePath = this.projectPath + "/" + storagePath;
     } else {
       this.storagePath = storagePath;
