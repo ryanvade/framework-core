@@ -3,7 +3,7 @@ import Application from "../src/Application/Application";
 import "mocha";
 
 describe("Application Test", () => {
-  it("Can be intantiated", () => {
+  it("Can be instantiated", () => {
     // Given a project path
     const path = "/project";
     // Instantiate an Application with the project path
