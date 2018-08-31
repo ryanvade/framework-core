@@ -1,3 +1,1 @@
-export default interface Constructable<T> {
-  new (...args: any[]): T;
-}
+export default type Constructable<T> = { new (...args: any[]): T }

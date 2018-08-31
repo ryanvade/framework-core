@@ -1,7 +1,7 @@
 export default interface ContainerInterface {
   bound(abstract: string): boolean;
   alias(abstract: string, alias: string): void;
-  bind<T>(abstract: string, concrete?: any, shared?: boolean): void;
+  bind<T>(abstract: string, concrete?: string | symbol): boolean;
   bindIf(abstract: string, concrete?: any, shared?: boolean): void;
   singleton(abstract: string, concrete?: any): void;
   make(abstract: string, parameters: Array<any>): any;
