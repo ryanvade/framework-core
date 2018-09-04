@@ -57,13 +57,28 @@ class TestClassWithMultipleArgs {
   }
 }
 
+class SingleClass {
+  created: Date;
+  constructor() {
+    this.created = new Date();
+  }
+
+  name(): string {
+    return "SingleClass";
+  }
+
+  createdAt(): string {
+    return this.created.toString();
+  }
+}
+
 describe("Container Constructor Test", () => {
   it("Can be Instantiated", () => {
     const container = new Container();
     expect(container).not.equal(undefined);
   });
 
-  it("Can register classes without constructor arguments", () => {
+  it("Can register classes", () => {
     const container = new Container();
     const registered = container.bind("testclassnoargsconstructor", TestClassNoArgsConstructor);
     const bound = container.bound("testclassnoargsconstructor");
@@ -78,7 +93,7 @@ describe("Container Constructor Test", () => {
     expect(resolved.getA()).to.equal("4");
   });
 
-  it("Can register classes with constructor arguments", () => {
+  it("Can resolve classes with constructor arguments", () => {
     const container = new Container();
     const registered = container.bind("testclassnoargsconstructor", TestClassNoArgsConstructor);
     const registered2 = container.bind("testclasswithargsconstructor", TestClassWithArgsConstructor);
@@ -87,7 +102,7 @@ describe("Container Constructor Test", () => {
     expect(resolved.getB()).to.equal(4);
   });
 
-  it("Can register classes with multiple layers of constructor arguments", () => {
+  it("Can resolve classes with multiple layers of constructor arguments", () => {
     const container = new Container();
     const registered = container.bind("testclassnoargsconstructor", TestClassNoArgsConstructor);
     const registered2 = container.bind("testclasswithargsconstructor", TestClassWithArgsConstructor);
@@ -97,7 +112,7 @@ describe("Container Constructor Test", () => {
     expect(resolved.getC()).to.equal(4);
   });
 
-  it("Can register classes with multiple constructor arguments", () => {
+  it("Can resolve classes with multiple constructor arguments", () => {
     const container = new Container();
     const registered = container.bind("testclassnoargsconstructor", TestClassNoArgsConstructor);
     const registered2 = container.bind("testclasswithargsconstructor", TestClassWithArgsConstructor);
@@ -107,5 +122,34 @@ describe("Container Constructor Test", () => {
     expect(resolved).not.equal(undefined);
     expect(resolved.getD()).to.equal(4);
     expect(resolved.getE()).to.equal(4);
+  });
+
+  it("Can resolve classes from an alias", () => {
+    const container = new Container();
+    const registered = container.bind("testclassnoargsconstructor", TestClassNoArgsConstructor);
+    container.alias("noargs", "testclassnoargsconstructor");
+    const bound = container.bound("noargs");
+    expect(bound).to.be.true;
+    const resolved = container.get("noargs");
+    expect(resolved).not.equal(undefined);
+    expect(resolved.getA()).to.equal("4");
+  });
+
+  it("Can resolve singleton classes", () => {
+    const container = new Container();
+    const registered = container.singleton("singleclass", SingleClass);
+    const resolved = container.get("singleclass");
+    expect(resolved).not.equal(undefined);
+    expect(resolved.name()).to.equal("SingleClass");
+  });
+
+  it("Does not create an instance of a singleton if one already exists", () => {
+    const container = new Container();
+    const registered = container.singleton("singleclass", SingleClass);
+    const resolved = container.get("singleclass");
+    const resolved2 = container.get("singleclass");
+    expect(resolved).not.equal(undefined);
+    expect(resolved2).not.equal(undefined);
+    expect(resolved.createdAt()).to.equal(resolved2.createdAt());
   });
 });

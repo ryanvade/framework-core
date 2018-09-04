@@ -28,15 +28,7 @@ export default class Container implements ContainerInterface {
     this.aliases.set(abstract, alias);
   }
 
-  bind<T>(abstract: string, concrete?: Constructable<T> | string | undefined, singleton?: boolean): ContainerInterface {
-    // If concrete is undefined then abstract is a placeholder
-    if (concrete == undefined) {
-        concrete = abstract;
-    }
-
-    if (typeof concrete == "string") {
-      // Get a Constructable for the type
-    }
+  bind<T>(abstract: string, concrete: Constructable<T>, singleton?: boolean): ContainerInterface {
 
     if (singleton == undefined) {
       singleton = false;
@@ -71,18 +63,14 @@ export default class Container implements ContainerInterface {
   }
 
   bindIf(abstract: string, concrete?: any, singleton?: boolean) {
-    if (! this.bound(abstract)) {
+    if (!this.bound(abstract)) {
       return this.bind(abstract, concrete, singleton);
     }
     return this;
   }
 
-  singleton<T>(abstract: string, concrete?: Constructable<T> | undefined) {
+  singleton<T>(abstract: string, concrete: Constructable<T>) {
     return this.bind(abstract, concrete, true);
-  }
-
-  make(abstract: string, parameters: Array<any>) {
-    return "any";
   }
 
   resolved(abstract: string) {
@@ -101,9 +89,13 @@ export default class Container implements ContainerInterface {
     abstract = abstract.toLowerCase();
     // Check that the container has the type
     if (this.bound(abstract)) {
-    // Get Arguments for the type
-    const options = new ResolverOptions(this);
-    return this.resolve(abstract, options);
+      // if this is an alias, get the concrete
+      if (this.aliases.has(abstract)) {
+        abstract = (this.aliases.get(abstract) as string);
+      }
+      // Get Arguments for the type
+      const options = new ResolverOptions(this);
+      return this.resolve(abstract, options);
     }
     throw new Error("Not Bound");
   }
