@@ -1,1 +1,3 @@
-export default type Constructable<T> = { new (...args: any[]): T }
+type Constructable<T> = { new (...args: any[]): T; };
+
+export default Constructable;
