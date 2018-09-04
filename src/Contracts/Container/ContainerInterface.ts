@@ -3,10 +3,10 @@ import ResovlerOptionsInterface from "./ResolverOptionsInterface";
 
 export default interface ContainerInterface {
   bound(abstract: string): boolean;
-  alias(abstract: string, alias: string): void;
+  alias(abstract: string, alias: string): ContainerInterface;
   bind<T>(abstract: string, concrete: Constructable<T>, singleton?: boolean): ContainerInterface;
-  bindIf(abstract: string, concrete?: any, shared?: boolean): void;
-  singleton(abstract: string, concrete: Constructable<T>): void;
+  bindIf(abstract: string, concrete?: any, shared?: boolean): ContainerInterface;
+  singleton<T>(abstract: string, concrete: Constructable<T>): ContainerInterface;
   resolved(abstract: string): boolean;
   call(callable: any, parameters: Array<any>, defaultMethod?: string): any;
   get(abstract: string): any;

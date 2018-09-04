@@ -24,8 +24,9 @@ export default class Container implements ContainerInterface {
     return this.bindings.has(abstract) || this.aliases.has(abstract);
   }
 
-  alias(abstract: string, alias: string) {
+  alias(abstract: string, alias: string): ContainerInterface {
     this.aliases.set(abstract, alias);
+    return this;
   }
 
   bind<T>(abstract: string, concrete: Constructable<T>, singleton?: boolean): ContainerInterface {
@@ -62,14 +63,14 @@ export default class Container implements ContainerInterface {
     return Reflect.construct(concrete[0], opts.toArray());
   }
 
-  bindIf(abstract: string, concrete?: any, singleton?: boolean) {
+  bindIf(abstract: string, concrete?: any, singleton?: boolean): ContainerInterface {
     if (!this.bound(abstract)) {
       return this.bind(abstract, concrete, singleton);
     }
     return this;
   }
 
-  singleton<T>(abstract: string, concrete: Constructable<T>) {
+  singleton<T>(abstract: string, concrete: Constructable<T>): ContainerInterface {
     return this.bind(abstract, concrete, true);
   }
 
