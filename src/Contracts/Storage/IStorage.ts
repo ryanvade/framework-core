@@ -32,9 +32,9 @@ export default interface IStorage {
   // list directory contents (listDir)
   listDir(path: string, recursive?: boolean): Array<string> | boolean;
   // write stream (writeStream)
-  writeStream(path: string, stream: ReadableStream): boolean;
+  writeStream(path: string, stream: ReadableStream): Promise<boolean>;
   // read stream (readStream)
   readStream(path: string): Stream | false;
   // update stream (updateStream)
-  updateStream(path: string, stream: ReadableStream): boolean;
+  updateStream(path: string, stream: ReadableStream): Promise<boolean>;
 }

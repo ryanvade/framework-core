@@ -22,7 +22,7 @@ export default class LocalStorage implements IStorage {
 
   update(path: string, contents: string) {
     try {
-      fs.writeFileSync(this.basePath + path, contents, "wx");
+      fs.writeFileSync(this.basePath + path, contents, {"flag": "wx"});
     } catch (e) {
       return false;
     }
@@ -31,8 +31,9 @@ export default class LocalStorage implements IStorage {
 
   put(path: string, contents: string) {
     try {
-      fs.writeFileSync(this.basePath + path, contents, "w+");
+      fs.appendFileSync(this.basePath + path, contents);
     } catch (e) {
+      console.error(e);
       return false;
     }
     return true;
@@ -40,8 +41,9 @@ export default class LocalStorage implements IStorage {
 
   read(path: string) {
     try {
-      return fs.readFileSync(this.basePath + path);
+      return fs.readFileSync(this.basePath + path).toString();
     } catch (e) {
+      console.log(e);
       return false;
     }
   }
@@ -60,11 +62,11 @@ export default class LocalStorage implements IStorage {
   }
 
   readAndDelete(path: string) {
-    const content = this.read(this.basePath + path);
+    const content = this.read(path);
     if (content === false) {
       return false;
     }
-    const deleted = this.delete(this.basePath + path);
+    const deleted = this.delete(path);
     if (deleted === false) {
       return false;
     }
@@ -97,7 +99,7 @@ export default class LocalStorage implements IStorage {
   timestamps(path: string) {
     try {
       const stat = fs.statSync(this.basePath + path);
-      return stat.atime;
+      return stat.atime.getUTCMilliseconds();
     } catch (e) {
       return -1;
     }
@@ -113,6 +115,10 @@ export default class LocalStorage implements IStorage {
   }
 
   createDir(path: string) {
+    if (path[0] != "/") {
+      path = "/" + path;
+    }
+
     try {
       fs.mkdirSync(this.basePath + path);
     } catch (e) {
