@@ -21,6 +21,9 @@
           "Contracts/*": [
             "src/Contracts/*"
           ],
+          "Storage/*": [
+            "src/Storage/*"
+          ],
             "*": [
                 "node_modules/*",
                 "src/types/*"

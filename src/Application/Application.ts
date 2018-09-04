@@ -1,4 +1,4 @@
-import Container from "Container/Container";
+import Container from "../Container/Container";
 import * as path from "path";
 import * as os from "os";
 

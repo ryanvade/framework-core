@@ -15,7 +15,9 @@
   },
   "dependencies": {
     "@types/glob": "^5.0.35",
+    "@types/mime-types": "^2.1.0",
     "awilix": "^3.0.9",
+    "mime-types": "^2.1.20",
     "reflect-metadata": "^0.1.12",
     "typescript": "^3.0.1"
   },
