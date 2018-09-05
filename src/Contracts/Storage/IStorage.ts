@@ -37,4 +37,6 @@ export default interface IStorage {
   readStream(path: string): Stream | false;
   // update stream (updateStream)
   updateStream(path: string, stream: ReadableStream): Promise<boolean>;
+  // validate the path
+  validatePath(path: string): string;
 }

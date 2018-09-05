@@ -12,6 +12,8 @@ export default class LocalStorage implements IStorage {
   }
 
   write(path: string, contents: string) {
+    path = this.validatePath(path);
+
     try {
       fs.writeFileSync(this.basePath + path, contents);
     } catch (e) {
@@ -21,8 +23,10 @@ export default class LocalStorage implements IStorage {
   }
 
   update(path: string, contents: string) {
+    path = this.validatePath(path);
+
     try {
-      fs.writeFileSync(this.basePath + path, contents, {"flag": "wx"});
+      fs.writeFileSync(this.basePath + path, contents, { "flag": "wx" });
     } catch (e) {
       return false;
     }
@@ -30,6 +34,8 @@ export default class LocalStorage implements IStorage {
   }
 
   put(path: string, contents: string) {
+    path = this.validatePath(path);
+
     try {
       fs.appendFileSync(this.basePath + path, contents);
     } catch (e) {
@@ -40,6 +46,8 @@ export default class LocalStorage implements IStorage {
   }
 
   read(path: string) {
+    path = this.validatePath(path);
+
     try {
       return fs.readFileSync(this.basePath + path).toString();
     } catch (e) {
@@ -49,10 +57,14 @@ export default class LocalStorage implements IStorage {
   }
 
   has(path: string) {
+    path = this.validatePath(path);
+
     return fs.existsSync(this.basePath + path);
   }
 
   delete(path: string) {
+    path = this.validatePath(path);
+
     try {
       fs.unlinkSync(this.basePath + path);
     } catch (e) {
@@ -62,6 +74,8 @@ export default class LocalStorage implements IStorage {
   }
 
   readAndDelete(path: string) {
+    path = this.validatePath(path);
+
     const content = this.read(path);
     if (content === false) {
       return false;
@@ -75,6 +89,9 @@ export default class LocalStorage implements IStorage {
   }
 
   rename(from: string, to: string) {
+    from = this.validatePath(from);
+    to = this.validatePath(to);
+
     try {
       fs.renameSync(this.basePath + from, this.basePath + to);
     } catch (e) {
@@ -84,6 +101,9 @@ export default class LocalStorage implements IStorage {
   }
 
   copy(from: string, to: string) {
+    from = this.validatePath(from);
+    to = this.validatePath(to);
+
     try {
       fs.copyFileSync(this.basePath + from, this.basePath + to);
     } catch (e) {
@@ -93,10 +113,14 @@ export default class LocalStorage implements IStorage {
   }
 
   mimeType(path: string) {
+    path = this.validatePath(path);
+
     return mime.lookup(Path.basename(this.basePath + path));
   }
 
   timestamps(path: string) {
+    path = this.validatePath(path);
+
     try {
       const stat = fs.statSync(this.basePath + path);
       return stat.atime.getUTCMilliseconds();
@@ -106,6 +130,8 @@ export default class LocalStorage implements IStorage {
   }
 
   size(path: string) {
+    path = this.validatePath(path);
+
     try {
       const stat = fs.statSync(this.basePath + path);
       return stat.size;
@@ -115,9 +141,7 @@ export default class LocalStorage implements IStorage {
   }
 
   createDir(path: string) {
-    if (path[0] != "/") {
-      path = "/" + path;
-    }
+    path = this.validatePath(path);
 
     try {
       fs.mkdirSync(this.basePath + path);
@@ -129,6 +153,8 @@ export default class LocalStorage implements IStorage {
   }
 
   deleteDir(path: string) {
+    path = this.validatePath(path);
+
     try {
       fs.rmdirSync(this.basePath + path);
     } catch (e) {
@@ -138,6 +164,8 @@ export default class LocalStorage implements IStorage {
   }
 
   listDir(path: string, recursive?: boolean) {
+    path = this.validatePath(path);
+
     if (recursive === undefined) {
       recursive = false;
     }
@@ -150,6 +178,8 @@ export default class LocalStorage implements IStorage {
   }
 
   async writeStream(path: string, stream: ReadableStream) {
+    path = this.validatePath(path);
+
     try {
       let chunk = await stream.getReader().read();
       while (chunk !== undefined) {
@@ -163,6 +193,8 @@ export default class LocalStorage implements IStorage {
   }
 
   readStream(path: string) {
+    path = this.validatePath(path);
+
     try {
       return fs.createReadStream(this.basePath + path);
     } catch (e) {
@@ -171,6 +203,8 @@ export default class LocalStorage implements IStorage {
   }
 
   async updateStream(path: string, stream: ReadableStream) {
+    path = this.validatePath(path);
+
     try {
       let chunk = await stream.getReader().read();
       while (chunk !== undefined) {
@@ -181,5 +215,16 @@ export default class LocalStorage implements IStorage {
       return false;
     }
     return true;
+  }
+
+  validatePath(path: string): string {
+    if (path.length == 0) {
+      throw Error("Invalid Path");
+    }
+
+    if (!path.startsWith("/")) {
+      path = "/".concat(path);
+    }
+    return path;
   }
 }
