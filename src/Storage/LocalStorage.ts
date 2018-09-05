@@ -122,6 +122,7 @@ export default class LocalStorage implements IStorage {
     try {
       fs.mkdirSync(this.basePath + path);
     } catch (e) {
+      console.error(e);
       return false;
     }
     return true;

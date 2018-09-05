@@ -59,6 +59,3 @@ typings/
 
 # next.js build output
 .next
-
-# For now, don't include built objects
-dist/
