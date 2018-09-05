@@ -205,14 +205,12 @@ describe("Local File Storage", () => {
     const contents = "This is Contents";
     storage.write("orig.txt", contents);
     let stream = (storage.readStream("orig.txt") as Readable);
-    await setTimeout(() => {
-      expect(stream).to.not.be.false;
-      const wrote = storage.writeStream("test.txt", (stream as Readable));
-      expect(wrote).to.be.true;
-      fs.unlinkSync(storagePath + "/orig.txt");
-      fs.unlinkSync(storagePath + "/test.txt");
-      stream.destroy();
-    }, 1000);
+    expect(stream).to.not.be.false;
+    const wrote = await storage.writeStream("test.txt", (stream as Readable));
+    expect(wrote).to.be.true;
+    fs.unlinkSync(storagePath + "/orig.txt");
+    fs.unlinkSync(storagePath + "/test.txt");
+    stream.destroy()
   });
 
   it("Can update to files with streams", async () => {
@@ -222,15 +220,13 @@ describe("Local File Storage", () => {
     storage.write("orig2.txt", contents);
     storage.write("test2.txt", "This is Contents");
     let stream = (storage.readStream("orig2.txt") as Readable);
-    await setTimeout(() => {
-      expect(stream).to.not.be.false;
-      const wrote = storage.updateStream("test2.txt", (stream as Readable));
-      expect(wrote).to.be.true;
-      expect(storage.read("test2.txt")).to.equal("This is Contents" + contents);
-      fs.unlinkSync(storagePath + "/orig2.txt");
-      fs.unlinkSync(storagePath + "/test2.txt");
-      stream.destroy();
-    }, 1000);
+    expect(stream).to.not.be.false;
+    const wrote = await storage.updateStream("test2.txt", (stream as Readable));
+    expect(wrote).to.be.true;
+    expect(storage.read("test2.txt")).to.equal("This is Contents" + contents);
+    fs.unlinkSync(storagePath + "/orig2.txt");
+    fs.unlinkSync(storagePath + "/test2.txt");
+    stream.destroy();
   });
 
   it("Validates given paths", () => {

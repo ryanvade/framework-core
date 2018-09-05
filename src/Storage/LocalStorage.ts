@@ -189,41 +189,46 @@ export default class LocalStorage implements IStorage {
 
   writeStream(path: string, stream: Readable) {
     path = this.validatePath(path);
-    try {
-      let buff = stream.read();
-      if (!buff) {
-        return false;
-      }
+    return new Promise<boolean>((resolve, reject) => {
+      try {
+        const pass = new Stream.PassThrough();
+        const write = fs.createWriteStream(this.basePath + path);
+        pass.on("end", () => { resolve(true); });
+        pass.on("close", () => { resolve(true); });
+        pass.on("error", () => { reject(false); });
+        stream.on("end", () => { resolve(true); });
+        stream.on("close", () => { resolve(true); });
+        stream.on("error", () => { reject(false); });
+        write.on("error", () => { reject(false); });
 
-      this.delete(path);
-      while (buff) {
-        fs.appendFileSync(this.basePath + path, buff);
-        buff = stream.read();
+        pass.pipe(write);
+        stream.pipe(pass);
+      } catch (e) {
+        reject(false);
       }
-    } catch (e) {
-      console.error(e);
-      return false;
-    }
-    return true;
+    });
   }
 
   updateStream(path: string, stream: Readable) {
     path = this.validatePath(path);
-    try {
-      let buff = stream.read();
-      if (!buff) {
-        return false;
-      }
+    return new Promise<boolean>((resolve, reject) => {
+      try {
+        const pass = new Stream.PassThrough();
+        const write = fs.createWriteStream(this.basePath + path, { flags: 'a+' });
+        pass.on("end", () => { resolve(true); });
+        pass.on("close", () => { resolve(true); });
+        pass.on("error", () => { reject(false); });
+        stream.on("end", () => { resolve(true); });
+        stream.on("close", () => { resolve(true); });
+        stream.on("error", () => { reject(false); });
+        write.on("error", () => { reject(false); });
 
-      while (buff) {
-        fs.appendFileSync(this.basePath + path, buff);
-        buff = stream.read();
+        pass.pipe(write);
+        stream.pipe(pass);
+      } catch (e) {
+        reject(false);
       }
-    } catch (e) {
-      console.error(e);
-      return false;
-    }
-    return true;
+    });
   }
 
   validatePath(path: string): string {
