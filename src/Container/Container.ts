@@ -1,27 +1,28 @@
 import Helpers from "../Helpers/Helpers";
 import ResolverOptions from "./ResolverOptions";
+import Creator from "../Contracts/Container/Creator";
 import Constructable from "../Contracts/Container/Constructable";
 import ContainerInterface from "Contracts/Container/ContainerInterface";
-import ContainerBindingException from "Contracts/Container/ContainerBindingException";
 import ResovlerOptionsInterface from "../Contracts/Container/ResolverOptionsInterface";
 // /// <reference path="../../Contracts/Container/ContainerInterface"/>
 
 
 export default class Container implements ContainerInterface {
-  bindings: Map<string, [string | Constructable<any>, boolean]>;
+  bindings: Map<string, [string | Constructable<any> | Creator<any>, boolean]>;
   aliases: Map<string, string>;
-  instances: Map<string, Constructable<any>>;
-  resolves: Map<string, string | Constructable<any>>;
+  instances: Map<string, Constructable<any> | Creator<any> | any>;
+  resolves: Map<string, string | Constructable<any> | Creator<any>>;
 
   constructor() {
     this.bindings = new Map();
     this.aliases = new Map();
     this.instances = new Map();
     this.resolves = new Map();
+    this.instances.set("container", this);
   }
 
   bound(abstract: string): boolean {
-    return this.bindings.has(abstract) || this.aliases.has(abstract);
+    return this.bindings.has(abstract) || this.aliases.has(abstract) || this.instances.has(abstract);
   }
 
   alias(abstract: string, alias: string): ContainerInterface {
@@ -29,10 +30,14 @@ export default class Container implements ContainerInterface {
     return this;
   }
 
-  bind<T>(abstract: string, concrete: Constructable<T>, singleton?: boolean): ContainerInterface {
+  bind<T>(abstract: string, concrete: string | Constructable<T> | Creator<T>, singleton?: boolean): ContainerInterface {
 
     if (singleton == undefined) {
       singleton = false;
+    }
+
+    if (typeof concrete == "string") {
+      concrete = this.getCreator(concrete);
     }
 
     this.bindings.set(abstract, [concrete, singleton]);
@@ -41,9 +46,23 @@ export default class Container implements ContainerInterface {
   }
 
   resolve(abstract: string, opts: ResovlerOptionsInterface): any {
+    if (this.instances.has(abstract)) {
+      return this.instances.get(abstract);
+    }
+
     const concrete = (this.bindings.get(abstract) as Array<any>);
     const type = concrete[0];
     const singleton = concrete[1];
+
+    if (Helpers.IsFunction(type.toString())) {
+      opts.getFunctionArguments(type.toString());
+      const func = function() {
+        return type(...opts.toArray());
+      };
+
+      func.bind(opts);
+      return func;
+    }
 
     if (typeof type == "string") {
       return this.instances.get(type);
@@ -82,7 +101,7 @@ export default class Container implements ContainerInterface {
     return this.resolves.has(abstract) || this.instances.has(abstract);
   }
 
-  call(callable: any, parameters: Array<any>, defaultMethod?: string) {
+  call(callable: Function, parameters: Array<any>, defaultMethod?: string) {
     return "any";
   }
 
@@ -102,7 +121,25 @@ export default class Container implements ContainerInterface {
   }
 
   has(abstract: string) {
-    return false;
+    return this.bound(abstract);
+  }
+
+  getCreator<T>(abstract: string) {
+    return function(this: Container): T {
+      if (!this.bound(abstract)) {
+        throw new Error("Not Bound");
+      }
+
+      if (this.aliases.has(abstract)) {
+        abstract = (this.aliases.get(abstract) as string);
+      }
+      // Get Arguments for the type
+      const options = new ResolverOptions(this);
+      const concrete = (this.bindings.get(abstract) as Array<any>);
+      const type = concrete[0];
+      options.getClassArguments(type.toString());
+      return Reflect.construct(type, options.toArray());
+    };
   }
 
   // factory(abstract: string): Closure;

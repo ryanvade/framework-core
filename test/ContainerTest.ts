@@ -1,6 +1,7 @@
 import { expect } from "chai";
+import Creator from "Contracts/Container/Creator";
 import Container from "../src/Container/Container";
-import Constructable from "../src/Contracts/Container/Constructable";
+import Constructable from "Contracts/Container/Constructable";
 import "mocha";
 
 class TestClassNoArgsConstructor {
@@ -71,6 +72,15 @@ class SingleClass {
     return this.created.toString();
   }
 }
+
+const noArgsCreator = function(): TestClassNoArgsConstructor {
+  return new TestClassNoArgsConstructor();
+};
+
+const argsCreator = function(container: Container): TestClassWithArgsConstructor {
+  const noArtgs = container.get("testclassnoargsconstructor");
+  return new TestClassWithArgsConstructor(noArtgs);
+};
 
 describe("Container Constructor Test", () => {
   it("Can be Instantiated", () => {
@@ -151,5 +161,29 @@ describe("Container Constructor Test", () => {
     expect(resolved).not.equal(undefined);
     expect(resolved2).not.equal(undefined);
     expect(resolved.createdAt()).to.equal(resolved2.createdAt());
+  });
+
+  it("Binds Factories", () => {
+    const container = new Container();
+    const registered = container.bind("testclassnoargsconstructor", noArgsCreator);
+    const bound = container.has("testclassnoargsconstructor");
+    expect(bound).to.be.true;
+  });
+
+  it("Resolves Factories with no args constructors", () => {
+    const container = new Container();
+    container.bind("testclassnoargsconstructor", noArgsCreator);
+    const resolved = container.get("testclassnoargsconstructor");
+    const noargs = resolved();
+    expect(noargs.getA()).to.equal("4");
+  });
+
+  it("Resolved Factories with constructor arguments", () => {
+    const container = new Container();
+    container.bind("testclassnoargsconstructor", TestClassNoArgsConstructor);
+    container.bind("testclasswithargsconstructor", argsCreator);
+    const resolved = container.get("testclasswithargsconstructor");
+    const args = resolved();
+    expect(args.getB()).to.equal(4);
   });
 });

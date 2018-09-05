@@ -204,7 +204,7 @@ describe("Local File Storage", () => {
     const storage = new LocalStorage(storagePath);
     const contents = "This is Contents";
     storage.write("orig.txt", contents);
-    let stream = (storage.readStream("orig.txt") as Readable);
+    const stream = (storage.readStream("orig.txt") as Readable);
     expect(stream).to.not.be.false;
     const wrote = await storage.writeStream("test.txt", (stream as Readable));
     expect(wrote).to.be.true;
@@ -219,7 +219,7 @@ describe("Local File Storage", () => {
     const contents = "This is also Contents";
     storage.write("orig2.txt", contents);
     storage.write("test2.txt", "This is Contents");
-    let stream = (storage.readStream("orig2.txt") as Readable);
+    const stream = (storage.readStream("orig2.txt") as Readable);
     expect(stream).to.not.be.false;
     const wrote = await storage.updateStream("test2.txt", (stream as Readable));
     expect(wrote).to.be.true;

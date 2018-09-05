@@ -5,4 +5,5 @@ export default interface ResolverOptionsInterface {
   container: ContainerInterface;
   toArray(): Array<any>;
   getClassArguments(src: string): boolean;
+  getFunctionArguments(src: string): boolean;
 }

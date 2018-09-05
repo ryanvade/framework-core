@@ -214,18 +214,19 @@ export default class LocalStorage implements IStorage {
     return new Promise<boolean>((resolve, reject) => {
       try {
         const pass = new Stream.PassThrough();
-        const write = fs.createWriteStream(this.basePath + path, { flags: 'a+' });
+        const write = fs.createWriteStream(this.basePath + path, { flags: "a+" });
         pass.on("end", () => { resolve(true); });
         pass.on("close", () => { resolve(true); });
-        pass.on("error", () => { reject(false); });
+        pass.on("error", (e) => { console.error(e); reject(false); });
         stream.on("end", () => { resolve(true); });
         stream.on("close", () => { resolve(true); });
-        stream.on("error", () => { reject(false); });
-        write.on("error", () => { reject(false); });
+        stream.on("error", (e) => { console.error(e); reject(false); });
+        write.on("error", (e) => { console.error(e); reject(false); });
 
         pass.pipe(write);
         stream.pipe(pass);
       } catch (e) {
+        console.error(e);
         reject(false);
       }
     });

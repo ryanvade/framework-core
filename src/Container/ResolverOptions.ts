@@ -4,12 +4,14 @@ import ResolverOptionsInterface from "../Contracts/Container/ResolverOptionsInte
 export default class ResolverOptions implements ResolverOptionsInterface {
   options: any[];
   container: ContainerInterface;
-  regex: RegExp;
+  classRegex: RegExp;
+  functionRegex: RegExp;
 
   constructor(container: ContainerInterface) {
     this.options = new Array<any>();
     this.container = container;
-    this.regex = new RegExp("constructor\\((\\w*,*\\s*\\w*)\\)");
+    this.classRegex = new RegExp("constructor\\s*\\((\\w*,*\\s*\\w*)\\)");
+    this.functionRegex = new RegExp("function\\s*\\((\\w*,*\\s*\\w*)\\)");
   }
 
   toArray() {
@@ -21,11 +23,11 @@ export default class ResolverOptions implements ResolverOptionsInterface {
       return false; // No Constructor...
     }
 
-    if (!this.regex.test(src)) {
+    if (!this.classRegex.test(src)) {
       return false;
     }
     // Use REGEX to get the paramaters in the constructor
-    const data = this.regex.exec(src);
+    const data = this.classRegex.exec(src);
     let paramsSrc = (data as any)[1];
     if (!paramsSrc) {
       return false;
@@ -37,5 +39,28 @@ export default class ResolverOptions implements ResolverOptionsInterface {
     });
     // ask the container for the
     return true;
+  }
+
+  getFunctionArguments(src: string) {
+    if (src.indexOf("function") < 0) {
+      return false;
+    }
+    if (!this.functionRegex.test(src)) {
+      return false;
+    }
+    // Use REGEX to get the paramaters in the constructor
+    const data = this.functionRegex.exec(src);
+    let paramsSrc = (data as any)[1];
+    if (!paramsSrc) {
+      return false;
+    }
+    paramsSrc = paramsSrc.split(/\s*,\s*/);
+    // go through each and check the type
+    paramsSrc.forEach((param: string) => {
+      this.options.push(this.container.get(param));
+    });
+    // ask the container for the
+    return true;
+
   }
 }
