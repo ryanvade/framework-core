@@ -1,4 +1,4 @@
-import { Stream } from "stream";
+import { Stream, Readable } from "stream";
 
 export default interface IStorage {
   // Write a file (write)
@@ -32,11 +32,11 @@ export default interface IStorage {
   // list directory contents (listDir)
   listDir(path: string, recursive?: boolean): Array<string> | boolean;
   // write stream (writeStream)
-  writeStream(path: string, stream: ReadableStream): Promise<boolean>;
+  writeStream(path: string, stream: Readable): boolean;
   // read stream (readStream)
   readStream(path: string): Stream | false;
   // update stream (updateStream)
-  updateStream(path: string, stream: ReadableStream): Promise<boolean>;
+  updateStream(path: string, stream: Readable): boolean;
   // validate the path
   validatePath(path: string): string;
 }

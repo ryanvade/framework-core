@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as Path from "path";
-import { Stream } from "stream";
+import { Stream, Readable } from "stream";
 import * as mime from "mime-types";
 import IStorage from "Contracts/Storage/IStorage";
 
@@ -177,21 +177,6 @@ export default class LocalStorage implements IStorage {
     }
   }
 
-  async writeStream(path: string, stream: ReadableStream) {
-    path = this.validatePath(path);
-
-    try {
-      let chunk = await stream.getReader().read();
-      while (chunk !== undefined) {
-        fs.writeFileSync(this.basePath + path, chunk);
-        chunk = await stream.getReader().read();
-      }
-    } catch (e) {
-      return false;
-    }
-    return true;
-  }
-
   readStream(path: string) {
     path = this.validatePath(path);
 
@@ -202,16 +187,39 @@ export default class LocalStorage implements IStorage {
     }
   }
 
-  async updateStream(path: string, stream: ReadableStream) {
+  writeStream(path: string, stream: Readable) {
     path = this.validatePath(path);
-
     try {
-      let chunk = await stream.getReader().read();
-      while (chunk !== undefined) {
-        fs.writeFileSync(this.basePath + path, chunk, "wx");
-        chunk = await stream.getReader().read();
+      let buff = stream.read();
+      if (!buff) {
+        return false;
+      }
+
+      while(buff) {
+        fs.writeFileSync(this.basePath + path, buff);
+        buff = stream.read();
       }
     } catch (e) {
+      console.error(e);
+      return false;
+    }
+    return true;
+  }
+
+  updateStream(path: string, stream: Readable) {
+    path = this.validatePath(path);
+    try {
+      let buff = stream.read();
+      if (!buff) {
+        return false;
+      }
+
+      while(buff) {
+        fs.appendFileSync(this.basePath + path, buff);
+        buff = stream.read();
+      }
+    } catch (e) {
+      console.error(e);
       return false;
     }
     return true;

@@ -2,6 +2,7 @@ import "mocha";
 import * as Path from "path";
 import * as fs from "fs";
 import { expect } from "chai";
+import { Readable } from "stream";
 import LocalStorage from "Storage/LocalStorage";
 
 describe("Local File Storage", () => {
@@ -21,6 +22,23 @@ describe("Local File Storage", () => {
     const created = storage.createDir("storage");
     expect(created).to.be.true;
     expect(fs.readdirSync(storagePath + "/storage")).not.to.be.false;
+  });
+
+  it("Can delete a directory", () => {
+    const storagePath = Path.normalize(__dirname + "/../dist/storage");
+    const storage = new LocalStorage(storagePath);
+    const created = storage.createDir("testdir");
+    const deleted = storage.deleteDir("testdir");
+    expect(deleted).to.be.true;
+  });
+
+  it("Can move a directory", () => {
+    const storagePath = Path.normalize(__dirname + "/../dist/storage");
+    const storage = new LocalStorage(storagePath);
+    const created = storage.createDir("testdir");
+    const moved = storage.rename("testdir", "testdir2");
+    expect(moved).to.be.true;
+    fs.rmdirSync(Path.normalize(__dirname + "/../dist/storage/testdir2"));
   });
 
   it("Can write data to a file", () => {
@@ -167,6 +185,52 @@ describe("Local File Storage", () => {
     const size = storage.size("logo.svg");
     expect(size).to.equal(5925);
     fs.unlinkSync(storagePath + "/logo.svg");
+  });
+
+  it("Can get a readable stream", () => {
+    const storagePath = Path.normalize(__dirname + "/../dist/storage");
+    const storage = new LocalStorage(storagePath);
+    const contents = "This is Contents";
+    const resp = storage.write("test.txt", contents);
+    expect(resp).to.be.true;
+    const stream = storage.readStream("test.txt");
+    expect(stream).not.equal(false);
+    expect((stream as any).isPaused()).to.be.false;
+    fs.unlinkSync(storagePath + "/test.txt");
+  });
+
+  it("Can write to files with streams", async () => {
+    const storagePath = Path.normalize(__dirname + "/../dist/storage");
+    const storage = new LocalStorage(storagePath);
+    const contents = "This is Contents";
+    storage.write("orig.txt", contents);
+    let stream = (storage.readStream("orig.txt") as Readable);
+    await setTimeout(() => {
+      expect(stream).to.not.be.false;
+      const wrote = storage.writeStream("test.txt", (stream as Readable));
+      expect(wrote).to.be.true;
+      fs.unlinkSync(storagePath + "/orig.txt");
+      fs.unlinkSync(storagePath + "/test.txt");
+      stream.destroy();
+    }, 1000);
+  });
+
+  it("Can update to files with streams", async () => {
+    const storagePath = Path.normalize(__dirname + "/../dist/storage");
+    const storage = new LocalStorage(storagePath);
+    const contents = "This is also Contents";
+    storage.write("orig2.txt", contents);
+    storage.write("test2.txt", "This is Contents");
+    let stream = (storage.readStream("orig2.txt") as Readable);
+    await setTimeout(() => {
+      expect(stream).to.not.be.false;
+      const wrote = storage.updateStream("test2.txt", (stream as Readable));
+      expect(wrote).to.be.true;
+      expect(storage.read("test2.txt")).to.equal("This is Contents" + contents);
+      fs.unlinkSync(storagePath + "/orig2.txt");
+      fs.unlinkSync(storagePath + "/test2.txt");
+      stream.destroy();
+    }, 1000);
   });
 
   it("Validates given paths", () => {
