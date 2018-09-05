@@ -195,8 +195,9 @@ export default class LocalStorage implements IStorage {
         return false;
       }
 
-      while(buff) {
-        fs.writeFileSync(this.basePath + path, buff);
+      this.delete(path);
+      while (buff) {
+        fs.appendFileSync(this.basePath + path, buff);
         buff = stream.read();
       }
     } catch (e) {
@@ -214,7 +215,7 @@ export default class LocalStorage implements IStorage {
         return false;
       }
 
-      while(buff) {
+      while (buff) {
         fs.appendFileSync(this.basePath + path, buff);
         buff = stream.read();
       }
