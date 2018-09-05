@@ -13,8 +13,4 @@ export default interface ContainerInterface {
   get(abstract: string): any;
   has(abstract: string): boolean;
   resolve(abstract: string, opts: ResovlerOptionsInterface): any;
-  getCreator<T>(abstract: string): Creator<T>;
-  // build<T>(concrete: string): Creator<T>;
-  // make<T>(abstract: string, concrete: string): Creator<T>;
-  // factory(abstract: string): Closure;
 }

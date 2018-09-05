@@ -186,4 +186,18 @@ describe("Container Constructor Test", () => {
     const args = resolved();
     expect(args.getB()).to.equal(4);
   });
+
+  it("Registers strings", () => {
+    const container = new Container();
+    container.bind("key", "value");
+    const bound = container.has("key");
+    expect(bound).to.be.true;
+  });
+
+  it("Resolves strings", () => {
+    const container = new Container();
+    container.bind("key", "value");
+    const resolved = container.get("key");
+    expect(resolved).to.equal("value");
+  });
 });

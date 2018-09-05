@@ -37,7 +37,8 @@ export default class Container implements ContainerInterface {
     }
 
     if (typeof concrete == "string") {
-      concrete = this.getCreator(concrete);
+      this.instances.set(abstract, concrete);
+      return this;
     }
 
     this.bindings.set(abstract, [concrete, singleton]);
@@ -123,24 +124,4 @@ export default class Container implements ContainerInterface {
   has(abstract: string) {
     return this.bound(abstract);
   }
-
-  getCreator<T>(abstract: string) {
-    return function(this: Container): T {
-      if (!this.bound(abstract)) {
-        throw new Error("Not Bound");
-      }
-
-      if (this.aliases.has(abstract)) {
-        abstract = (this.aliases.get(abstract) as string);
-      }
-      // Get Arguments for the type
-      const options = new ResolverOptions(this);
-      const concrete = (this.bindings.get(abstract) as Array<any>);
-      const type = concrete[0];
-      options.getClassArguments(type.toString());
-      return Reflect.construct(type, options.toArray());
-    };
-  }
-
-  // factory(abstract: string): Closure;
 }
