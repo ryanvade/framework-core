@@ -24,6 +24,9 @@
           "Storage/*": [
             "src/Storage/*"
           ],
+          "Logging/*": [
+            "src/Logging/*"
+          ],
             "*": [
                 "node_modules/*",
                 "src/types/*"
